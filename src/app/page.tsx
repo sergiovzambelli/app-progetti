@@ -13,12 +13,15 @@ interface Position {
   y: number;
 }
 
-// Sample data for the bubbles
 const elements: Element[] = [
-  { id: 1, name: "Progetto bello" },
-  { id: 2, name: "Sposarsi" },
-  { id: 3, name: "Sopravvivere fino a domani" },
-  { id: 4, name: "Scrivere una canzone" },
+  { id: 1, name: "Applicazione Per Idee" },
+  { id: 2, name: "Applicazione Per Progetti" },
+  { id: 3, name: "App Mano Paolo" },
+  { id: 4, name: "Sito Sergio Fotografia" },
+  { id: 5, name: "GGG" },
+  { id: 6, name: "Pythagorean" },
+  { id: 7, name: "Game Theory Course" },
+  { id: 8, name: "Agent On Hugging Face" },
 ];
 
 // Define a color palette
@@ -37,14 +40,11 @@ export default function Home() {
     bottom: 0,
   });
 
-  const [positions, setPositions] = useState<{ [key: number]: Position }>(
-    elements.reduce((acc, element) => {
-      acc[element.id] = { x: window.innerWidth / 2, y: window.innerHeight / 2 }; // Fallback center position
-      return acc;
-    }, {} as { [key: number]: Position })
-  );
+  const [positions, setPositions] = useState<{ [key: number]: Position }>({});
 
   useEffect(() => {
+    if (typeof window === "undefined") return; // Ensure it's running on client
+
     const updateConstraints = () => {
       if (containerRef.current) {
         const { offsetWidth, offsetHeight } = containerRef.current;
@@ -55,17 +55,17 @@ export default function Home() {
           bottom: offsetHeight - 50,
         });
 
-        // Update positions **only if they haven’t been set properly**
+        // Set initial positions if not already set
         setPositions((prevPositions) =>
-          elements.reduce((acc, element) => {
-            acc[element.id] = prevPositions[element.id]?.x
-              ? prevPositions[element.id] // Keep previous if exists
-              : {
+          Object.keys(prevPositions).length === 0
+            ? elements.reduce((acc, element) => {
+                acc[element.id] = {
                   x: Math.random() * (offsetWidth - 50),
                   y: Math.random() * (offsetHeight - 50),
                 };
-            return acc;
-          }, {} as { [key: number]: Position })
+                return acc;
+              }, {} as { [key: number]: Position })
+            : prevPositions
         );
       }
     };
@@ -88,7 +88,7 @@ export default function Home() {
         <Bubble
           key={element.id}
           element={element}
-          position={positions[element.id]}
+          position={positions[element.id] || { x: 100, y: 100 }} // Fallback position
           onPositionUpdate={handlePositionUpdate}
           color={colors[element.id % colors.length]}
           constraints={constraints}
