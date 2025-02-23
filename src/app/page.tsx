@@ -60,8 +60,8 @@ export default function Home() {
           Object.keys(prevPositions).length === 0
             ? elements.reduce((acc, element) => {
                 acc[element.id] = {
-                  x: Math.random() * (offsetWidth - 50),
-                  y: Math.random() * (offsetHeight - 50),
+                  x: offsetWidth/2, // Center X
+                  y: offsetHeight/2, // Center Y
                 };
                 return acc;
               }, {} as { [key: number]: Position })
@@ -88,7 +88,7 @@ export default function Home() {
         <Bubble
           key={element.id}
           element={element}
-          position={positions[element.id] || { x: 100, y: 100 }} // Fallback position
+          position={positions[element.id] || { x: 200, y: 300 }} // Fallback position
           onPositionUpdate={handlePositionUpdate}
           color={colors[element.id % colors.length]}
           constraints={constraints}
