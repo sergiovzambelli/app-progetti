@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Bubble from "../components/Bubble";
+import Panel from "@/components/Panel";
+import { supabase } from "@/utils/supabaseClient"; // Import the Supabase client
 
 interface Element {
   id: number;
@@ -13,22 +15,18 @@ interface Position {
   y: number;
 }
 
-const elements: Element[] = [
-  { id: 1, name: "Applicazione Per Idee" },
-  { id: 2, name: "Applicazione Per Progetti" },
-  { id: 3, name: "App Mano Paolo" },
-  { id: 4, name: "Sito Sergio Fotografia" },
-  { id: 5, name: "GGG" },
-  { id: 6, name: "Pythagorean" },
-  { id: 7, name: "Game Theory Course" },
-  { id: 8, name: "Agent On Hugging Face" },
-];
-
 // Define a color palette
 const colors = [
-  "#FF6B6B", "#4ECDC4", "#FFE66D", "#FF9F1C", 
-  "#6B5B95", "#88D8B0", "#FFCCCC", "#AAD8B0", 
-  "#B19CD9", "#FFD700",
+  "#FF6B6B",
+  "#4ECDC4",
+  "#FFE66D",
+  "#FF9F1C",
+  "#6B5B95",
+  "#88D8B0",
+  "#FFCCCC",
+  "#AAD8B0",
+  "#B19CD9",
+  "#FFD700",
 ];
 
 export default function Home() {
@@ -41,6 +39,34 @@ export default function Home() {
   });
 
   const [positions, setPositions] = useState<{ [key: number]: Position }>({});
+  const [isPanelOpen, setIsPanelOpen] = useState(false); // State for panel visibility
+  const [elements, setElements] = useState<Element[]>([]); // State for fetched elements
+  const [loading, setLoading] = useState(true); // State for loading indicator
+
+  // Fetch data from Supabase
+  const fetchData = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("projects") // Replace with your table name
+        .select("*");
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setElements(data); // Update the elements state with fetched data
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData(); // Fetch data when the component mounts
+  }, [fetchData]);
 
   useEffect(() => {
     if (typeof window === "undefined") return; // Ensure it's running on client
@@ -60,8 +86,8 @@ export default function Home() {
           Object.keys(prevPositions).length === 0
             ? elements.reduce((acc, element) => {
                 acc[element.id] = {
-                  x: offsetWidth/2, // Center X
-                  y: offsetHeight/2, // Center Y
+                  x: offsetWidth / 2, // Center X
+                  y: offsetHeight / 2, // Center Y
                 };
                 return acc;
               }, {} as { [key: number]: Position })
@@ -73,7 +99,7 @@ export default function Home() {
     updateConstraints();
     window.addEventListener("resize", updateConstraints);
     return () => window.removeEventListener("resize", updateConstraints);
-  }, []);
+  }, [elements]); // Re-run when elements change
 
   const handlePositionUpdate = (id: number, newPosition: Position) => {
     setPositions((prev) => ({
@@ -82,8 +108,23 @@ export default function Home() {
     }));
   };
 
+  const togglePanel = () => {
+    setIsPanelOpen(!isPanelOpen);
+  };
+
+  if (loading) {
+    return (
+      <div className="w-screen h-screen bg-dark-blue flex items-center justify-center">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
+
   return (
-    <div ref={containerRef} className="w-screen h-screen bg-dark-blue overflow-hidden relative">
+    <div
+      ref={containerRef}
+      className="w-screen h-screen bg-dark-blue overflow-hidden relative"
+    >
       {elements.map((element) => (
         <Bubble
           key={element.id}
@@ -94,6 +135,11 @@ export default function Home() {
           constraints={constraints}
         />
       ))}
+      <Panel
+        isOpen={isPanelOpen}
+        onToggle={togglePanel}
+        onElementCreated={fetchData} // Pass fetchData to refresh the list
+      />
     </div>
   );
 }
