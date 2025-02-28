@@ -52,7 +52,7 @@ export default function Bubble({ element, position, onPositionUpdate, color, con
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
     >
       <motion.span
-        className="text-sm font-semibold text-center font-poppins"
+        className="text-m font-semibold text-center font-poppins"
         initial={{ opacity: 0 }}
         whileHover={{ opacity: 1 }}
         whileTap={{ opacity: 1 }}
