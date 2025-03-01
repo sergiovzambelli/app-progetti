@@ -17,8 +17,8 @@ export default function SignUp() {
       await signUp(email, password); // Use the signUp method from useAuth
       alert("Check your email for the confirmation link!");
       router.push("/signin");
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError((error as Error).message);
     }
   };
 

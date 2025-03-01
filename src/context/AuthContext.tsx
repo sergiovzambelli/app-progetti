@@ -6,7 +6,7 @@ import { supabase } from '@/utils/supabaseClient';
 
 // Define the shape of the context
 type AuthContextType = {
-  user: any;
+  user: unknown;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create a provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
