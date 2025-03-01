@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 import { Poppins } from "next/font/google";
 
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body
         className={`antialiased ${poppins.variable}`}
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/utils/supabaseClient"; // Import Supabase client
+import { useAuth } from "@/context/AuthContext";
 
 interface PanelProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface PanelProps {
 
 export default function Panel({ isOpen, onToggle, onElementCreated }: PanelProps) {
   const [name, setName] = useState(""); // State for the input field
+  const { signOut } = useAuth(); // Use the signOut method from useAuth
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +48,16 @@ export default function Panel({ isOpen, onToggle, onElementCreated }: PanelProps
       console.error("Error creating new element:", error);
     }
   };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(); // Call the signOut method from useAuth
+      alert("You have been signed out."); // Optional: Show a confirmation message
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
 
   return (
     <div
@@ -84,6 +96,12 @@ export default function Panel({ isOpen, onToggle, onElementCreated }: PanelProps
             Create Project
           </button>
         </form>
+        <button
+          onClick={handleSignOut}
+          className="w-full mt-4 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+        >
+          Sign Out
+        </button>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Bubble from "../components/Bubble";
 import Panel from "@/components/Panel";
 import { supabase } from "@/utils/supabaseClient"; // Import the Supabase client
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface Element {
   id: number;
@@ -42,6 +44,15 @@ export default function Home() {
   const [isPanelOpen, setIsPanelOpen] = useState(false); // State for panel visibility
   const [elements, setElements] = useState<Element[]>([]); // State for fetched elements
   const [loading, setLoading] = useState(true); // State for loading indicator
+
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/signin'); // Redirect to sign-in page if the user is null
+    }
+  }, [user, router]);
 
   // Fetch data from Supabase
   const fetchData = useCallback(async () => {
